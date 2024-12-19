@@ -51,7 +51,6 @@ BEGIN
         sel <= "11";
         WAIT FOR 10 ns;
 
-        -- Finish simulation
         WAIT;
     END PROCESS;
 END Behavioral;
