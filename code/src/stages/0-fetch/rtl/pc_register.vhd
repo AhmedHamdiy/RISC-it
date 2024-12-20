@@ -1,3 +1,4 @@
+
 LIBRARY IEEE;
 USE IEEE.std_logic_1164.ALL;
 USE IEEE.STD_LOGIC_UNSIGNED.ALL;
@@ -17,14 +18,14 @@ BEGIN
     PROCESS (clk)
     BEGIN
         IF (RISING_EDGE(clk)) THEN
-            IF (rst) THEN
-                stop_till_reset <= '0';
+            IF (rst = '1') THEN
+                stop_till_rst <= '0';
                 next_ins_address <= (OTHERS => '0');
-            ELSIF (NOT stop_till_reset) THEN
-                IF ((NOT one_cycle) AND (NOT hlt)) THEN
+            ELSIF (stop_till_rst = '0') THEN
+                IF (one_cycle = '0' AND hlt = '0') THEN
                     next_ins_address <= pc_in;
-                ELSIF hlt THEN
-                    stop_till_reset <= '1';
+                ELSIF hlt = '1' THEN
+                    stop_till_rst <= '1';
                 END IF;
             END IF;
         END IF;
