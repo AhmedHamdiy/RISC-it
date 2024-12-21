@@ -30,7 +30,6 @@ ARCHITECTURE fetch_stage_arch OF fetch_stage IS
   ---------MUX SIGNALS---------
   SIGNAL adder_out : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
   SIGNAL branch_mux_out : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
-  SIGNAL ID_branch_mux_out : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
 
   SIGNAL ind_mux_out : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
   SIGNAL ex_mem_int_mux_out : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
@@ -86,7 +85,7 @@ BEGIN
   one_cycle <= STALL OR RTI OR INT;
   pc_reg_inst : pc_reg PORT MAP(rst_mux_out, clk, HLT, RST, one_cycle, read_address_in);
   ins_mem_inst : instruction_memory PORT MAP(clk, read_address_in, instruction_sig, IM2, IM4, IM6, IM8);
-  branching_mux : mux2to1_16bit PORT MAP(pc_plus, ID_branch_mux_out, BRANCH, branch_mux_out);
+  branching_mux : mux2to1_16bit PORT MAP(pc_plus, JMP_inst, BRANCH, branch_mux_out);
   index_mux : mux2to1_16bit PORT MAP(IM6, IM8, INDEX, ind_mux_out);
   ex_mem_int_mux : mux2to1_16bit PORT MAP(branch_mux_out, ind_mux_out, EX_MEM_INT, ex_mem_int_mux_out);
   exp_mux : mux2to1_16bit PORT MAP(IM2, IM4, EXP_TYPE, exp_mux_out);
