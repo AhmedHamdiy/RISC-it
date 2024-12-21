@@ -20,9 +20,9 @@ ENTITY fetch_stage IS
     ---------MUX INPUT SIGNALS---------
     JMP_inst : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
     -------------------------------------
-    instruction : OUT STD_LOGIC_VECTOR (15 DOWNTO 0);
-    flush : OUT STD_LOGIC;
-    pc : OUT STD_LOGIC_VECTOR (15 DOWNTO 0)
+    instruction : OUT STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
+    flush : OUT STD_LOGIC := '0';
+    pc : OUT STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0')
   );
 END fetch_stage;
 
@@ -51,10 +51,6 @@ ARCHITECTURE fetch_stage_arch OF fetch_stage IS
 
   SIGNAL one : STD_LOGIC_VECTOR (15 DOWNTO 0) := (0 => '1', OTHERS => '0');
   SIGNAL pc_plus : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
-
-  TYPE saved_addresses_array IS ARRAY (9 DOWNTO 0) OF STD_LOGIC_VECTOR(15 DOWNTO 0);
-  SIGNAL saved_addresses : saved_addresses_array := (OTHERS => (OTHERS => '0'));
-
   ---------COMPONENTS---------
   COMPONENT pc_reg IS
     PORT (
@@ -86,11 +82,11 @@ ARCHITECTURE fetch_stage_arch OF fetch_stage IS
   END COMPONENT;
 BEGIN
   ---------PORT MAPPING---------
+  pc_plus <= read_address_in + one;
   one_cycle <= STALL OR RTI OR INT;
   pc_reg_inst : pc_reg PORT MAP(rst_mux_out, clk, HLT, RST, one_cycle, read_address_in);
   ins_mem_inst : instruction_memory PORT MAP(clk, read_address_in, instruction_sig, IM2, IM4, IM6, IM8);
-  pc_plus <= read_address_in + one;
-  branching_mux : mux2to1_16bit PORT MAP(ID_branch_mux_out, pc_plus, BRANCH, branch_mux_out);
+  branching_mux : mux2to1_16bit PORT MAP(pc_plus, ID_branch_mux_out, BRANCH, branch_mux_out);
   index_mux : mux2to1_16bit PORT MAP(IM6, IM8, INDEX, ind_mux_out);
   ex_mem_int_mux : mux2to1_16bit PORT MAP(branch_mux_out, ind_mux_out, EX_MEM_INT, ex_mem_int_mux_out);
   exp_mux : mux2to1_16bit PORT MAP(IM2, IM4, EXP_TYPE, exp_mux_out);
