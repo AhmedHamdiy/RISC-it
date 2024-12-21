@@ -6,24 +6,28 @@ USE IEEE.numeric_std.ALL;
 ENTITY fetch_stage IS
   PORT (
     clk : IN STD_LOGIC;
-    instruction : OUT STD_LOGIC_VECTOR (15 DOWNTO 0)
+    ---------MUX CONTROL SIGNALS---------
+    HLT : IN STD_LOGIC;
+    RTI : IN STD_LOGIC;
+    INT : IN STD_LOGIC;
+    STALL : IN STD_LOGIC;
+    BRANCH : IN STD_LOGIC;
+    RST : IN STD_LOGIC;
+    EXP_TYPE : IN STD_LOGIC;
+    EX : IN STD_LOGIC;
+    INDEX : IN STD_LOGIC;
+    EX_MEM_INT : IN STD_LOGIC;
+    ---------MUX INPUT SIGNALS---------
+    JMP_inst : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+    -------------------------------------
+    instruction : OUT STD_LOGIC_VECTOR (15 DOWNTO 0);
+    flush : OUT STD_LOGIC;
+    pc : OUT STD_LOGIC_VECTOR (15 DOWNTO 0)
   );
 END fetch_stage;
 
 ARCHITECTURE fetch_stage_arch OF fetch_stage IS
-  ---------MUX CONTROL SIGNALS---------
-  SIGNAL HLT : STD_LOGIC := '0';
-  SIGNAL RTI : STD_LOGIC := '0';
-  SIGNAL INT : STD_LOGIC := '0';
-  SIGNAL STALL : STD_LOGIC := '0';
-  SIGNAL BRANCH : STD_LOGIC := '0';
-  SIGNAL RST : STD_LOGIC := '1';
-  SIGNAL EXP_TYPE : STD_LOGIC := '0';
-  SIGNAL EXP : STD_LOGIC := '0';
-  SIGNAL INDEX : STD_LOGIC := '0';
-  SIGNAL EX_MEM_INT : STD_LOGIC := '0';
   ---------MUX SIGNALS---------
-  SIGNAL JMP_inst : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
   SIGNAL adder_out : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
   SIGNAL branch_mux_out : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
   SIGNAL ID_branch_mux_out : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
@@ -42,6 +46,7 @@ ARCHITECTURE fetch_stage_arch OF fetch_stage IS
   ---------OTHER SIGNALS---------
   SIGNAL one_cycle : STD_LOGIC := '0';
   SIGNAL read_address_in : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL instruction_sig : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
   SIGNAL stop_till_rst : STD_LOGIC := '0';
 
   SIGNAL one : STD_LOGIC_VECTOR (15 DOWNTO 0) := (0 => '1', OTHERS => '0');
@@ -83,12 +88,21 @@ BEGIN
   ---------PORT MAPPING---------
   one_cycle <= STALL OR RTI OR INT;
   pc_reg_inst : pc_reg PORT MAP(rst_mux_out, clk, HLT, RST, one_cycle, read_address_in);
-  ins_mem_inst : instruction_memory PORT MAP(clk, read_address_in, instruction, IM2, IM4, IM6, IM8);
+  ins_mem_inst : instruction_memory PORT MAP(clk, read_address_in, instruction_sig, IM2, IM4, IM6, IM8);
   pc_plus <= read_address_in + one;
   branching_mux : mux2to1_16bit PORT MAP(ID_branch_mux_out, pc_plus, BRANCH, branch_mux_out);
   index_mux : mux2to1_16bit PORT MAP(IM6, IM8, INDEX, ind_mux_out);
   ex_mem_int_mux : mux2to1_16bit PORT MAP(branch_mux_out, ind_mux_out, EX_MEM_INT, ex_mem_int_mux_out);
   exp_mux : mux2to1_16bit PORT MAP(IM2, IM4, EXP_TYPE, exp_mux_out);
-  ex_mux : mux2to1_16bit PORT MAP(ex_mem_int_mux_out, exp_mux_out, EXP, ex_mux_out);
+  ex_mux : mux2to1_16bit PORT MAP(ex_mem_int_mux_out, exp_mux_out, EX, ex_mux_out);
   rst_mux : mux2to1_16bit PORT MAP(ex_mux_out, IM0, RST, rst_mux_out);
+
+  PROCESS (clk)
+  BEGIN
+    IF (rising_edge(clk)) THEN
+      pc <= read_address_in;
+      flush <= BRANCH;
+      instruction <= instruction_sig;
+    END IF;
+  END PROCESS;
 END fetch_stage_arch;
