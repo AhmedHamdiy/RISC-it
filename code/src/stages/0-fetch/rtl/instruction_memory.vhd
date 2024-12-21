@@ -40,14 +40,12 @@ ARCHITECTURE instruction_memory_arch OF instruction_memory IS
     SIGNAL ram : ram_type := init_ram_from_file;
 BEGIN
 
-    PROCESS (clk)
+    PROCESS (address)
     BEGIN
-        IF RISING_EDGE(clk) THEN
-            IF (TO_INTEGER(UNSIGNED(address)) < mem_depth) THEN
-                inst <= ram(TO_INTEGER(UNSIGNED(address)));
-            ELSE
-                inst <= (OTHERS => '0');
-            END IF;
+        IF (TO_INTEGER(UNSIGNED(address)) < mem_depth) THEN
+            inst <= ram(TO_INTEGER(UNSIGNED(address)));
+        ELSE
+            inst <= (OTHERS => '0');
         END IF;
     END PROCESS;
 
