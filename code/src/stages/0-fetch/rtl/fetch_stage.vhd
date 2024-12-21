@@ -11,7 +11,6 @@ ENTITY fetch_stage IS
 END fetch_stage;
 
 ARCHITECTURE fetch_stage_arch OF fetch_stage IS
-BEGIN
   ---------MUX CONTROL SIGNALS---------
   SIGNAL HLT : STD_LOGIC := '0';
   SIGNAL RTI : STD_LOGIC := '0';
@@ -65,9 +64,12 @@ BEGIN
       clk : IN STD_LOGIC;
       address : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
       inst : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-      saved_addresses : OUT ARRAY(9 DOWNTO 0) OF STD_LOGIC_VECTOR(15 DOWNTO 0);
+      empty_stack : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+      invalid_mem_add : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+      INT0 : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+      INT2 : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
     );
-  END COMPONENT instruction_memory;
+  END COMPONENT;
 
   COMPONENT mux2to1_16bit IS
     PORT (
@@ -77,10 +79,11 @@ BEGIN
       y : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
     );
   END COMPONENT;
+BEGIN
   ---------PORT MAPPING---------
   one_cycle <= STALL OR RTI OR INT;
-  -- pc_reg_inst : pc_reg PORT MAP(rst_mux_out, clk, HLT, RST, one_cycle, read_address_in); 
-  -- ins_mem_inst : instruction_memory PORT MAP(clk, read_address_in, instruction, saved_addresses);
+  pc_reg_inst : pc_reg PORT MAP(rst_mux_out, clk, HLT, RST, one_cycle, read_address_in);
+  ins_mem_inst : instruction_memory PORT MAP(clk, read_address_in, instruction, IM2, IM4, IM6, IM8);
   pc_plus <= read_address_in + one;
   branching_mux : mux2to1_16bit PORT MAP(ID_branch_mux_out, pc_plus, BRANCH, branch_mux_out);
   index_mux : mux2to1_16bit PORT MAP(IM6, IM8, INDEX, ind_mux_out);
@@ -88,20 +91,4 @@ BEGIN
   exp_mux : mux2to1_16bit PORT MAP(IM2, IM4, EXP_TYPE, exp_mux_out);
   ex_mux : mux2to1_16bit PORT MAP(ex_mem_int_mux_out, exp_mux_out, EXP, ex_mux_out);
   rst_mux : mux2to1_16bit PORT MAP(ex_mux_out, IM0, RST, rst_mux_out);
-  ------------------------------
-  PROCESS (clk)
-  BEGIN
-    IF (RISING_EDGE(clk)) THEN
-      IF (RST = '1') THEN
-        stop_till_rst <= '0';
-        read_address_in <= (OTHERS => '0');
-      ELSIF (stop_till_rst = '0') THEN
-        IF (one_cycle = '0' AND HLT = '0') THEN
-          read_address_in <= rst_mux_out;
-        ELSIF HLT = '1' THEN
-          stop_till_rst <= '1';
-        END IF;
-      END IF;
-    END IF;
-  END PROCESS;
 END fetch_stage_arch;
