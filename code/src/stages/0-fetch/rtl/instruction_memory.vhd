@@ -1,7 +1,9 @@
 LIBRARY IEEE;
 USE IEEE.std_logic_1164.ALL;
-USE IEEE.STD_LOGIC_UNSIGNED.ALL;
 USE IEEE.numeric_std.ALL;
+
+LIBRARY std;
+USE std.textio.ALL;
 
 ENTITY instruction_memory IS
     PORT (
@@ -19,17 +21,36 @@ ARCHITECTURE instruction_memory_arch OF instruction_memory IS
     CONSTANT mem_depth : INTEGER := 4096;
     CONSTANT word_width : INTEGER := 16;
     TYPE ram_type IS ARRAY(mem_depth - 1 DOWNTO 0) OF STD_LOGIC_VECTOR (word_width - 1 DOWNTO 0);
-    SIGNAL ram : ram_type := (OTHERS => (OTHERS => '0'));
 
+    IMPURE FUNCTION init_ram_from_file RETURN ram_type IS
+        FILE ram_file : TEXT OPEN READ_MODE IS "memory_init.txt";
+        VARIABLE text_line : LINE;
+        VARIABLE ram_content : ram_type;
+        VARIABLE bv : BIT_VECTOR(word_width - 1 DOWNTO 0);
+        VARIABLE i : INTEGER := 0;
+    BEGIN
+        WHILE NOT ENDFILE(ram_file) LOOP
+            READLINE(ram_file, text_line);
+            READ(text_line, bv);
+            ram_content(i) := TO_STDLOGICVECTOR(bv);
+            i := i + 1;
+        END LOOP;
+        RETURN ram_content;
+    END FUNCTION;
+    SIGNAL ram : ram_type := init_ram_from_file;
 BEGIN
-    PROCESS (clk) IS
+
+    PROCESS (clk)
     BEGIN
         IF RISING_EDGE(clk) THEN
-            IF (TO_INTEGER(UNSIGNED(address)) < mem_depth - 1) THEN
+            IF (TO_INTEGER(UNSIGNED(address)) < mem_depth) THEN
                 inst <= ram(TO_INTEGER(UNSIGNED(address)));
+            ELSE
+                inst <= (OTHERS => '0');
             END IF;
         END IF;
     END PROCESS;
+
     empty_stack <= ram(0);
     invalid_mem_add <= ram(1);
     INT0 <= ram(2);
