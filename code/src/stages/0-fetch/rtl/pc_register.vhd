@@ -8,7 +8,7 @@ ENTITY pc_reg IS
     PORT (
         pc_in : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
         clk, hlt, rst, one_cycle : IN STD_LOGIC;
-        next_ins_address : OUT STD_LOGIC_VECTOR (15 DOWNTO 0)
+        next_ins_address : OUT STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0')
     );
 END ENTITY pc_reg;
 
