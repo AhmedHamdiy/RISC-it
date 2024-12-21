@@ -9,11 +9,11 @@ ENTITY instruction_memory IS
     PORT (
         clk : IN STD_LOGIC;
         address : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-        inst : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-        empty_stack : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-        invalid_mem_add : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-        INT0 : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-        INT2 : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
+        inst : OUT STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');
+        empty_stack : OUT STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');
+        invalid_mem_add : OUT STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');
+        INT0 : OUT STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');
+        INT2 : OUT STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0')
     );
 END ENTITY instruction_memory;
 
