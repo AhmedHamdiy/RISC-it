@@ -4,11 +4,12 @@ USE IEEE.STD_LOGIC_UNSIGNED.ALL;
 USE IEEE.numeric_std.ALL;
 
 ENTITY instruction_memory IS
+    TYPE saved_array_type IS ARRAY (3 DOWNTO 0) OF STD_LOGIC_VECTOR(15 DOWNTO 0);
     PORT (
         clk : IN STD_LOGIC;
         address : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
         inst : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-        saved_addresses : OUT ARRAY(9 DOWNTO 0) OF STD_LOGIC_VECTOR(15 DOWNTO 0);
+        saved_addresses : OUT saved_array_type
     );
 END ENTITY instruction_memory;
 
@@ -29,5 +30,5 @@ BEGIN
             END IF;
         END IF;
     END PROCESS;
-    saved_addresses <= ram(9 DOWNTO 0);
+    saved_addresses <= ram(3 DOWNTO 0);
 END ARCHITECTURE;
