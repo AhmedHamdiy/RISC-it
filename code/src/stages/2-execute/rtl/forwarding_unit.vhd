@@ -8,7 +8,6 @@ ENTITY forwarding_unit IS
         clk : IN STD_LOGIC;
         src1_addr : IN STD_LOGIC_VECTOR (2 DOWNTO 0);
         src2_addr : IN STD_LOGIC_VECTOR (2 DOWNTO 0);
-        dst_addr : IN STD_LOGIC_VECTOR (2 DOWNTO 0);
         prev1_addr : IN STD_LOGIC_VECTOR (2 DOWNTO 0);
         prev2_addr : IN STD_LOGIC_VECTOR (2 DOWNTO 0);
 

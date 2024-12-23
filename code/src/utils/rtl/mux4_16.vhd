@@ -1,17 +1,18 @@
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
 
-ENTITY mux4 IS
+ENTITY mux4to1_16bit IS
     PORT (
-        d0, d1, d2, d3 : IN STD_LOGIC;
+        d0, d1, d2, d3 : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
         sel : IN STD_LOGIC_VECTOR(1 DOWNTO 0);
-        y : OUT STD_LOGIC
+        y : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
     );
-END mux4;
+END mux4to1_16bit;
 
-ARCHITECTURE mux4_arch OF mux4 IS
+ARCHITECTURE mux4to1_16bit_arch OF mux4to1_16bit IS
 BEGIN
-    PROCESS (sel, d0, d1, d2, d3)
+    PROCESS (d0, d1, d2, d3, sel)
     BEGIN
         CASE sel IS
             WHEN "00" =>
@@ -23,7 +24,7 @@ BEGIN
             WHEN "11" =>
                 y <= d3;
             WHEN OTHERS =>
-                y <= '0';
+                y <= (OTHERS => '0');
         END CASE;
     END PROCESS;
-END mux4_arch;
+END mux4to1_16bit_arch;

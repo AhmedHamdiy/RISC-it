@@ -34,9 +34,9 @@ ARCHITECTURE instruction_memory_arch OF instruction_memory IS
             READ(text_line, bv);
             ram_content(i) := TO_STDLOGICVECTOR(bv);
             i := i + 1;
-        END LOOP;
+        END LOOP
         RETURN ram_content;
-    END FUNCTION;
+    END FUNCTION
     SIGNAL ram : ram_type := init_ram_from_file;
 BEGIN
 
