@@ -63,11 +63,12 @@ ARCHITECTURE fetch_stage_arch OF fetch_stage IS
     PORT (
       clk : IN STD_LOGIC;
       address : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-      inst : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-      empty_stack : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-      invalid_mem_add : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-      INT0 : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-      INT2 : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
+      inst : OUT STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');
+      first_inst : OUT STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');
+      empty_stack : OUT STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');
+      invalid_mem_add : OUT STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');
+      INT0 : OUT STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');
+      INT2 : OUT STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0')
     );
   END COMPONENT;
 
@@ -84,7 +85,7 @@ BEGIN
   pc_plus <= read_address_in + one;
   one_cycle <= STALL OR RTI OR INT;
   pc_reg_inst : pc_reg PORT MAP(rst_mux_out, clk, HLT, RST, one_cycle, read_address_in);
-  ins_mem_inst : instruction_memory PORT MAP(clk, read_address_in, instruction_sig, IM2, IM4, IM6, IM8);
+  ins_mem_inst : instruction_memory PORT MAP(clk, read_address_in, instruction_sig, IM0, IM2, IM4, IM6, IM8);
   branching_mux : mux2to1_16bit PORT MAP(pc_plus, JMP_inst, BRANCH, branch_mux_out);
   index_mux : mux2to1_16bit PORT MAP(IM6, IM8, INDEX, ind_mux_out);
   ex_mem_int_mux : mux2to1_16bit PORT MAP(branch_mux_out, ind_mux_out, EX_MEM_INT, ex_mem_int_mux_out);
@@ -95,7 +96,8 @@ BEGIN
   PROCESS (clk)
   BEGIN
     IF (rising_edge(clk)) THEN
-      pc <= read_address_in;
+      pc <= rst_mux_out;
+      read_address_in <= pc;
       flush <= BRANCH;
       instruction <= instruction_sig;
     END IF;
