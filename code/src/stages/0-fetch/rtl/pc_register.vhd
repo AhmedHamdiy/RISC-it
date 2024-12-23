@@ -20,7 +20,7 @@ BEGIN
         IF (RISING_EDGE(clk)) THEN
             IF (rst = '1') THEN
                 stop_till_rst <= '0';
-                next_ins_address <= (OTHERS => '0');
+                next_ins_address <= pc_in;
             ELSIF (stop_till_rst = '0') THEN
                 IF (one_cycle = '0' AND hlt = '0') THEN
                     next_ins_address <= pc_in;
