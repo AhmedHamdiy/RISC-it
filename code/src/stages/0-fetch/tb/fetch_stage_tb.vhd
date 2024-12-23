@@ -125,6 +125,11 @@ BEGIN
         HLT <= '0';
         WAIT FOR CLK_PERIOD;
 
+        RST <= '1';
+        WAIT FOR CLK_PERIOD;
+        RST <= '0';
+        WAIT FOR CLK_PERIOD;
+
         -- Test Case 7: Exception Handling
         EXP_TYPE <= '1';
         WAIT FOR 2 * CLK_PERIOD;

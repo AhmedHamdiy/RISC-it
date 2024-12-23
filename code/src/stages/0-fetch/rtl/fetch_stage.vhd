@@ -101,10 +101,14 @@ BEGIN
       pc <= IM0;
     END IF;
     IF (RISING_EDGE(clk)) THEN
+      REPORT "INT: " & STD_LOGIC'IMAGE(INT);
+      REPORT "one_cycle: " & STD_LOGIC'IMAGE(one_cycle);
+
       IF (HLT = '1') THEN
         stop_till_rst := '1';
       END IF;
       IF (stop_till_rst = '0' AND one_cycle = '0') THEN
+        REPORT "inside the normal op";
         pc <= rst_mux_out;
         read_address_in <= rst_mux_out;
         instruction <= instruction_sig;
