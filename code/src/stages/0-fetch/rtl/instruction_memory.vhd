@@ -10,6 +10,7 @@ ENTITY instruction_memory IS
         clk : IN STD_LOGIC;
         address : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
         inst : OUT STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');
+        first_inst : OUT STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');
         empty_stack : OUT STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');
         invalid_mem_add : OUT STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');
         INT0 : OUT STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');
@@ -48,9 +49,9 @@ BEGIN
             inst <= (OTHERS => '0');
         END IF;
     END PROCESS;
-
-    empty_stack <= ram(0);
-    invalid_mem_add <= ram(1);
-    INT0 <= ram(2);
-    INT2 <= ram(3);
+    first_inst <= ram(0);
+    empty_stack <= ram(1);
+    invalid_mem_add <= ram(2);
+    INT0 <= ram(3);
+    INT2 <= ram(4);
 END ARCHITECTURE;
