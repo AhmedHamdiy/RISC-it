@@ -114,6 +114,7 @@ BEGIN
   alu_result_mux : mux2to1_16bit PORT MAP(in_port, alu_result, input_enable, res);
   jmp_mux : mux4 PORT MAP('1', flags_out(1), flags_out(2), flags_out(3), jmp_type, branch_choice);
 
+  -- other compinational logic
   will_jmp <= branch = '1' AND branch_choice = '1';
   mem_excep <= '1' WHEN (alu_result > x"0FFF")
     AND (mem_read = '1' OR mem_write = '1') ELSE
@@ -121,9 +122,4 @@ BEGIN
   out_port <= Rsrc1 WHEN output_enable = '1' ELSE
     'Z';
 
-  PROCESS (clk)
-  BEGIN
-    IF rising_edge(clk) THEN
-    END IF;
-  END PROCESS;
 END execute_stage_arch;
