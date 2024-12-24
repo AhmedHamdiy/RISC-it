@@ -257,7 +257,59 @@ BEGIN
 
   PROCESS (clk)
   BEGIN
-    -- sycnronous code
+    IF (FALLING_EDGE(clk)) THEN
+
+      FD_in(15 DOWNTO 0) <= pc;
+      FD_in(31 DOWNTO 16) <= instruction;
+
+      IF (flush = '1') THEN
+        FD_in <= (OTHERS => '0');
+        FD_out <= (OTHERS => '0');
+      END IF;
+
+      DE_in(2 DOWNTO 0) <= dummy;
+      DE_in(5 DOWNTO 3) <= dummy;
+      DE_in(21 DOWNTO 6) <= dummy;
+      DE_in(42 DOWNTO 22) <= dummy;
+      DE_in(58 DOWNTO 43) <= dummy;
+      DE_in(61 DOWNTO 59) <= dummy;
+      DE_in(77 DOWNTO 62) <= dummy;
+
+      EM_in(6 DOWNTO 0) <= dummy;
+      EM_in(22 DOWNTO 7) <= dummy;
+      EM_in(38 DOWNTO 23) <= dummy;
+      EM_in(41 DOWNTO 39) <= dummy;
+      EM_in(57 DOWNTO 42) <= dummy;
+
+      MW_in(1 DOWNTO 0) <= dummy;
+      MW_in(17 DOWNTO 2) <= dummy;
+      MW_in(33 DOWNTO 18) <= dummy;
+      MW_in(36 DOWNTO 34) <= dummy;
+    END IF;
+
+    IF (RISING_EDGE(clk)) THEN
+      FD_out(15 DOWNTO 0) <= FD_in(15 DOWNTO 0);
+      FD_out(31 DOWNTO 16) <= FD_in(31 DOWNTO 16);
+
+      DE_out(2 DOWNTO 0) <= DE_in(2 DOWNTO 0);
+      DE_out(5 DOWNTO 3) <= DE_in(5 DOWNTO 3);
+      DE_out(21 DOWNTO 6) <= DE_in(21 DOWNTO 6);
+      DE_out(42 DOWNTO 22) <= DE_in(42 DOWNTO 22);
+      DE_out(58 DOWNTO 43) <= DE_in(58 DOWNTO 43);
+      DE_out(61 DOWNTO 59) <= DE_in(61 DOWNTO 59);
+      DE_out(77 DOWNTO 62) <= DE_in(77 DOWNTO 62);
+
+      EM_out(6 DOWNTO 0) <= EM_in(6 DOWNTO 0);
+      EM_out(22 DOWNTO 7) <= EM_in(22 DOWNTO 7);
+      EM_out(38 DOWNTO 23) <= EM_in(38 DOWNTO 23);
+      EM_out(41 DOWNTO 39) <= EM_in(41 DOWNTO 39);
+      EM_out(57 DOWNTO 42) <= EM_in(57 DOWNTO 42);
+
+      MW_out(1 DOWNTO 0) <= MW_in(1 DOWNTO 0);
+      MW_out(17 DOWNTO 2) <= MW_in(17 DOWNTO 2);
+      MW_out(33 DOWNTO 18) <= MW_in(33 DOWNTO 18);
+      MW_out(36 DOWNTO 34) <= MW_in(36 DOWNTO 34);
+    END IF;
   END PROCESS;
 
 END ARCHITECTURE risc_processor_arch;
