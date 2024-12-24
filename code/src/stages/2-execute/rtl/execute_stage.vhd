@@ -14,6 +14,8 @@ ENTITY execute_stage IS
     Imm : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
     flags_in : IN STD_LOGIC_VECTOR (3 DOWNTO 0);
     in_port : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+    pc_in : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+    Rdst_addr_in : IN STD_LOGIC_VECTOR (2 DOWNTO 0);
 
     -- Control signals
     flag_restore : IN STD_LOGIC;
@@ -28,11 +30,14 @@ ENTITY execute_stage IS
     mem_write : IN STD_LOGIC;
 
     -- Outputs
+    pc_out : OUT STD_LOGIC_VECTOR (15 DOWNTO 0);
+    Rdst_addr_out : IN STD_LOGIC_VECTOR (2 DOWNTO 0);
+
     out_port : OUT STD_LOGIC_VECTOR (15 DOWNTO 0);
     will_jmp : OUT STD_LOGIC;
     mem_excep : OUT STD_LOGIC;
     flags_out : OUT STD_LOGIC_VECTOR (3 DOWNTO 0);
-    res : OUT STD_LOGIC_VECTOR (15 DOWNTO 0)
+    res : OUT STD_LOGIC_VECTOR (15 DOWNTO 0);
   );
 END execute_stage;
 
@@ -125,5 +130,6 @@ BEGIN
     '0';
   out_port <= Rsrc1 WHEN output_enable = '1' ELSE
     (OTHERS => 'Z');
-
+  pc_out <= pc_in;
+  Rdst_addr_out <= Rdst_addr_in;
 END execute_stage_arch;
