@@ -38,66 +38,61 @@ ARCHITECTURE risc_processor_arch OF risc_processor IS
 
   COMPONENT decode_stage IS
     PORT (
-      PORT (
-        clk : IN STD_LOGIC;
-        reset : IN STD_LOGIC;
-        inst : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-        MEM_WB_rti : IN STD_LOGIC;
-        ID_EX_rti : IN STD_LOGIC;
-        ret : IN STD_LOGIC;
-        write_reg : IN STD_LOGIC;
-        has_immediate : IN STD_LOGIC;
-        data_to_write : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-        WB_Rdst : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
-        PC_in : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-        ID_EX_Rdst : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
-        ID_EX_Rsrc1 : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
-        ID_EX_Rsrc1_data : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-        ID_EX_mem_read : IN STD_LOGIC;
-        ID_EX_branch : IN STD_LOGIC;
-        EX_MEM_branch : IN STD_LOGIC;
-        ID_EX_stackop1 : IN STD_LOGIC;
-        pc_out : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-        Rsrc1, Rsrc2 : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-        Rsrc1_add, Rsrc2_add : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-        Rdst_address : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-        imm : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-        inst0 : OUT STD_LOGIC;
-        hazard : OUT STD_LOGIC;
-        stall : OUT STD_LOGIC;
-        will_branch : OUT STD_LOGIC;
-        jmp_add : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-        control_signals : OUT STD_LOGIC_VECTOR(20 DOWNTO 0)
-      )
+      clk : IN STD_LOGIC;
+      reset : IN STD_LOGIC;
+      inst : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+      MEM_WB_rti : IN STD_LOGIC;
+      ID_EX_rti : IN STD_LOGIC;
+      ret : IN STD_LOGIC;
+      write_reg : IN STD_LOGIC;
+      has_immediate : IN STD_LOGIC;
+      data_to_write : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+      WB_Rdst : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+      PC_in : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+      ID_EX_Rdst : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+      ID_EX_Rsrc1_data : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+      ID_EX_mem_read : IN STD_LOGIC;
+      ID_EX_branch : IN STD_LOGIC;
+      EX_MEM_branch : IN STD_LOGIC;
+      ID_EX_stackop1 : IN STD_LOGIC;
+      pc_out : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+      Rsrc1, Rsrc2 : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+      Rsrc1_add, Rsrc2_add : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+      Rdst_address : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+      imm : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+      inst0 : OUT STD_LOGIC;
+      hazard : OUT STD_LOGIC;
+      stall : OUT STD_LOGIC;
+      will_branch : OUT STD_LOGIC;
+      jmp_add : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+      control_signals : OUT STD_LOGIC_VECTOR(20 DOWNTO 0)
     );
   END COMPONENT;
 
   COMPONENT execute_stage IS
     PORT (
-      PORT (
-        clk : IN STD_LOGIC;
-        src1_addr, src2_addr : IN STD_LOGIC_VECTOR (2 DOWNTO 0);
-        prev1_addr, prev2_addr : IN STD_LOGIC_VECTOR (2 DOWNTO 0);
-        Rsrc1, Rsrc2 : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
-        mem_forwarded_Rsrc1, mem_forwarded_Rsrc2 : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
-        alu_forwarded_Rsrc1, alu_forwarded_Rsrc2 : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
-        Imm : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
-        flags_in : IN STD_LOGIC_VECTOR (3 DOWNTO 0);
-        in_port : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
-        pc_in : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
-        Rdst_addr_in : IN STD_LOGIC_VECTOR (2 DOWNTO 0);
+      clk : IN STD_LOGIC;
+      src1_addr, src2_addr : IN STD_LOGIC_VECTOR (2 DOWNTO 0);
+      prev1_addr, prev2_addr : IN STD_LOGIC_VECTOR (2 DOWNTO 0);
+      Rsrc1, Rsrc2 : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+      mem_forwarded_Rsrc1, mem_forwarded_Rsrc2 : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+      alu_forwarded_Rsrc1, alu_forwarded_Rsrc2 : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+      Imm : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+      flags_in : IN STD_LOGIC_VECTOR (3 DOWNTO 0);
+      in_port : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+      pc_in : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+      Rdst_addr_in : IN STD_LOGIC_VECTOR (2 DOWNTO 0);
 
-        control_signals : IN STD_LOGIC_VECTOR (20 DOWNTO 0);
+      control_signals : IN STD_LOGIC_VECTOR (20 DOWNTO 0);
 
-        pc_out : OUT STD_LOGIC_VECTOR (15 DOWNTO 0);
-        Rdst_addr_out : IN STD_LOGIC_VECTOR (2 DOWNTO 0);
+      pc_out : OUT STD_LOGIC_VECTOR (15 DOWNTO 0);
+      Rdst_addr_out : OUT STD_LOGIC_VECTOR (2 DOWNTO 0);
 
-        out_port : OUT STD_LOGIC_VECTOR (15 DOWNTO 0);
-        will_jmp : OUT STD_LOGIC;
-        mem_excep : OUT STD_LOGIC;
-        flags_out : OUT STD_LOGIC_VECTOR (3 DOWNTO 0);
-        res : OUT STD_LOGIC_VECTOR (15 DOWNTO 0)
-      )
+      out_port : OUT STD_LOGIC_VECTOR (15 DOWNTO 0);
+      will_jmp : OUT STD_LOGIC;
+      mem_excep : OUT STD_LOGIC;
+      flags_out : OUT STD_LOGIC_VECTOR (3 DOWNTO 0);
+      res : OUT STD_LOGIC_VECTOR (15 DOWNTO 0)
     );
   END COMPONENT;
 
@@ -108,8 +103,8 @@ ARCHITECTURE risc_processor_arch OF risc_processor IS
       alu_result : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
       Rsrc1 : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
       stack_reg_in : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
-      flags_in : IN STD_LOGIC_VECTOR (2 DOWNTO 0);
-      pc : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+      flags_in : IN STD_LOGIC_VECTOR (3 DOWNTO 0);
+      pc_mem, pc_ex : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
       rdst_addr : IN STD_LOGIC_VECTOR (2 DOWNTO 0);
       mem_exception : IN STD_LOGIC;
 
@@ -141,35 +136,35 @@ ARCHITECTURE risc_processor_arch OF risc_processor IS
   END COMPONENT;
 
   ---------STAGE REGISTERS---------
-  SIGNAL FD_in, FD_out : STD_LOGIC_VECTOR (31 DOWNTO 0);
-  SIGNAL DE_in, DE_out : STD_LOGIC_VECTOR (127 DOWNTO 0);
-  SIGNAL EM_in, EM_out : STD_LOGIC_VECTOR (127 DOWNTO 0);
-  SIGNAL MW_in, MW_out : STD_LOGIC_VECTOR (127 DOWNTO 0);
+  SIGNAL FD_in, FD_out : STD_LOGIC_VECTOR (31 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL DE_in, DE_out : STD_LOGIC_VECTOR (127 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL EM_in, EM_out : STD_LOGIC_VECTOR (127 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL MW_in, MW_out : STD_LOGIC_VECTOR (63 DOWNTO 0) := (OTHERS => '0');
   ---------REGISTERS OUTPUTS---------
-  SIGNAL FD_inst : STD_LOGIC_VECTOR (15 DOWNTO 0);
-  SIGNAL FD_pc_in : STD_LOGIC_VECTOR (15 DOWNTO 0);
+  SIGNAL FD_inst : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL FD_pc_in : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
 
-  SIGNAL DE_src1_addr : STD_LOGIC_VECTOR (2 DOWNTO 0);
-  SIGNAL DE_Rdst_addr_out : STD_LOGIC_VECTOR (2 DOWNTO 0);
-  SIGNAL DE_Rsrc1 : STD_LOGIC_VECTOR (15 DOWNTO 0);
-  SIGNAL DE_sig : STD_LOGIC_VECTOR (20 DOWNTO 0);
-  SIGNAL DE_pc_in : STD_LOGIC_VECTOR (15 DOWNTO 0);
-  SIGNAL DE_src2_addr : STD_LOGIC_VECTOR (2 DOWNTO 0);
-  SIGNAL DE_Rsrc2 : STD_LOGIC_VECTOR (15 DOWNTO 0);
+  SIGNAL DE_src1_addr : STD_LOGIC_VECTOR (2 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL DE_Rdst_addr_out : STD_LOGIC_VECTOR (2 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL DE_Rsrc1 : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL DE_sig : STD_LOGIC_VECTOR (20 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL DE_pc_in : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL DE_src2_addr : STD_LOGIC_VECTOR (2 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL DE_Rsrc2 : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
 
-  SIGNAL EM_sig : STD_LOGIC_VECTOR (10 DOWNTO 0);
-  SIGNAL EM_Rsrc1 : STD_LOGIC_VECTOR (15 DOWNTO 0);
-  SIGNAL EM_Res : STD_LOGIC_VECTOR (15 DOWNTO 0);
-  SIGNAL EM_Rdest_addr : STD_LOGIC_VECTOR (2 DOWNTO 0);
-  SIGNAL EM_pc : STD_LOGIC_VECTOR (15 DOWNTO 0);
-  SIGNAL EM_flags : STD_LOGIC_VECTOR (3 DOWNTO 0);
+  SIGNAL EM_sig : STD_LOGIC_VECTOR (10 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL EM_Rsrc1 : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL EM_Res : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL EM_Rdest_addr : STD_LOGIC_VECTOR (2 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL EM_pc : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL EM_flags : STD_LOGIC_VECTOR (3 DOWNTO 0) := (OTHERS => '0');
 
-  SIGNAL MW_sig : STD_LOGIC_VECTOR (3 DOWNTO 0);
-  SIGNAL MW_mem : STD_LOGIC_VECTOR (15 DOWNTO 0);
-  SIGNAL MW_res : STD_LOGIC_VECTOR (15 DOWNTO 0);
-  SIGNAL MW_Rdest_addr : STD_LOGIC_VECTOR (2 DOWNTO 0);
-  SIGNAL MW_flags : STD_LOGIC_VECTOR (3 DOWNTO 0);
-  SIGNAL MW_stack_reg : STD_LOGIC_VECTOR (15 DOWNTO 0);
+  SIGNAL MW_sig : STD_LOGIC_VECTOR (3 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL MW_mem : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL MW_res : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL MW_Rdest_addr : STD_LOGIC_VECTOR (2 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL MW_flags : STD_LOGIC_VECTOR (3 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL MW_stack_reg : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
 
   ---------SIGNALS ORDER-------------
   -- DE_sig :
@@ -209,27 +204,27 @@ ARCHITECTURE risc_processor_arch OF risc_processor IS
   -- interrupt => control_unit_out(2),
   -- rti => control_unit_out(3)
   ---------REGISTERS INPUTS---------
-  SIGNAL pc_FD, instruction : STD_LOGIC_VECTOR (15 DOWNTO 0);
-  SIGNAL flush, flush_branch, flush_hazard : STD_LOGIC;
+  SIGNAL pc_FD, instruction : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL flush, flush_branch, flush_hazard : STD_LOGIC := '0';
 
-  SIGNAL pc_DE : STD_LOGIC_VECTOR (15 DOWNTO 0);
-  SIGNAL Rsrc1_DE, Rsrc2_DE : STD_LOGIC_VECTOR (15 DOWNTO 0);
-  SIGNAL Rsrc1_addr_DE, Rsrc2_addr_DE, Rdest_addr_DE : STD_LOGIC_VECTOR (2 DOWNTO 0);
-  SIGNAL control_signals_DE : STD_LOGIC_VECTOR(20 DOWNTO 0);
+  SIGNAL pc_DE : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL Rsrc1_DE, Rsrc2_DE : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL Rsrc1_addr_DE, Rsrc2_addr_DE, Rdest_addr_DE : STD_LOGIC_VECTOR (2 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL control_signals_DE : STD_LOGIC_VECTOR(20 DOWNTO 0) := (OTHERS => '0');
 
-  SIGNAL pc_EM : STD_LOGIC_VECTOR (15 DOWNTO 0);
-  SIGNAL Rdest_addr_EM : STD_LOGIC_VECTOR (2 DOWNTO 0);
-  SIGNAL branch_EM : STD_LOGIC;
-  SIGNAL res_EM : STD_LOGIC_VECTOR (15 DOWNTO 0);
-  SIGNAL flags_EM, flags_MW : STD_LOGIC_VECTOR (3 DOWNTO 0);
+  SIGNAL pc_EM : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL Rdest_addr_EM : STD_LOGIC_VECTOR (2 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL branch_EM : STD_LOGIC := '0';
+  SIGNAL res_EM : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL flags_EM, flags_MW : STD_LOGIC_VECTOR (3 DOWNTO 0) := (OTHERS => '0');
 
-  SIGNAL mem_MW, stack_reg_MW : STD_LOGIC_VECTOR(15 DOWNTO 0);
+  SIGNAL mem_MW, stack_reg_MW : STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');
 
   ---------OTHER SIGNALS---------
-  SIGNAL imm_value : STD_LOGIC_VECTOR (15 DOWNTO 0);
-  SIGNAL jmp_add : STD_LOGIC_VECTOR (15 DOWNTO 0);
-  SIGNAL final_result : STD_LOGIC_VECTOR (15 DOWNTO 0);
-  SIGNAL int_index, stall, branch, mem_excep, excep, excep_type : STD_LOGIC;
+  SIGNAL imm_value : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL jmp_add : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL final_result : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL int_index, stall, branch, mem_excep, excep, excep_type : STD_LOGIC := '0';
 
 BEGIN
 
@@ -275,7 +270,7 @@ BEGIN
     Rsrc1_add => Rsrc1_addr_DE,
     Rsrc2_add => Rsrc2_addr_DE,
     Rdst_address => Rdest_addr_DE,
-    imm => Imm_value,
+    imm => imm_value,
     inst0 => int_index,
     hazard => flush_hazard,
     stall => stall,
@@ -296,8 +291,8 @@ BEGIN
     mem_forwarded_Rsrc2 => MW_res,
     alu_forwarded_Rsrc1 => EM_Res,
     alu_forwarded_Rsrc2 => EM_Res,
-    Imm => Imm_value,
-    flags_in => final_result,
+    Imm => imm_value,
+    flags_in => final_result(3 DOWNTO 0),
     in_port => input_port,
     pc_in => DE_pc_in,
     Rdst_addr_in => DE_Rdst_addr_out,
@@ -317,7 +312,8 @@ BEGIN
     Rsrc1 => EM_Rsrc1,
     stack_reg_in => MW_stack_reg,
     flags_in => flags_EM,
-    pc => pc_EM,
+    pc_mem => pc_EM,
+    pc_ex => pc_DE,
     rdst_addr => EM_Rdest_addr,
     mem_exception => mem_excep,
     stack_op => EM_sig(7 DOWNTO 6),
@@ -366,40 +362,24 @@ BEGIN
       EM_in(10 DOWNTO 0) <= DE_sig(10 DOWNTO 0);
       EM_in(26 DOWNTO 11) <= DE_Rsrc1;
       EM_in(42 DOWNTO 27) <= res_EM;
-      EM_in(46 DOWNTO 43) <= Rdest_addr_EM;
-      EM_in(62 DOWNTO 47) <= pc_EM;
-      EM_in(77 DOWNTO 62) <= flags_EM;
+      EM_in(45 DOWNTO 43) <= Rdest_addr_EM;
+      EM_in(61 DOWNTO 46) <= pc_EM;
+      EM_in(65 DOWNTO 62) <= flags_EM;
 
       MW_in(3 DOWNTO 0) <= EM_sig(3 DOWNTO 0);
-      MW_in(19 DOWNTO 4) <= mem_MW; ------------------------------------------------------Memory
-      MW_in(33 DOWNTO 18) <= EM_Res;
-      MW_in(36 DOWNTO 34) <= EM_Rdest_addr;
-      MW_in(52 DOWNTO 37) <= stack_reg_MW;
-      MW_in(68 DOWNTO 53) <= flags_MW;
+      MW_in(19 DOWNTO 4) <= mem_MW;
+      MW_in(35 DOWNTO 20) <= EM_Res;
+      MW_in(38 DOWNTO 36) <= EM_Rdest_addr;
+      MW_in(54 DOWNTO 39) <= stack_reg_MW;
+      MW_in(58 DOWNTO 55) <= flags_MW;
     END IF;
 
     IF (RISING_EDGE(clk)) THEN
-      FD_out(15 DOWNTO 0) <= FD_in(15 DOWNTO 0);
-      FD_out(31 DOWNTO 16) <= FD_in(31 DOWNTO 16);
+      FD_out <= FD_in;
+      DE_out <= DE_in;
+      EM_out <= EM_in;
+      MW_out <= MW_in;
 
-      DE_out(2 DOWNTO 0) <= DE_in(2 DOWNTO 0);
-      DE_out(5 DOWNTO 3) <= DE_in(5 DOWNTO 3);
-      DE_out(21 DOWNTO 6) <= DE_in(21 DOWNTO 6);
-      DE_out(42 DOWNTO 22) <= DE_in(42 DOWNTO 22);
-      DE_out(58 DOWNTO 43) <= DE_in(58 DOWNTO 43);
-      DE_out(61 DOWNTO 59) <= DE_in(61 DOWNTO 59);
-      DE_out(77 DOWNTO 62) <= DE_in(77 DOWNTO 62);
-
-      EM_out(6 DOWNTO 0) <= EM_in(6 DOWNTO 0);
-      EM_out(22 DOWNTO 7) <= EM_in(22 DOWNTO 7);
-      EM_out(38 DOWNTO 23) <= EM_in(38 DOWNTO 23);
-      EM_out(41 DOWNTO 39) <= EM_in(41 DOWNTO 39);
-      EM_out(57 DOWNTO 42) <= EM_in(57 DOWNTO 42);
-
-      MW_out(1 DOWNTO 0) <= MW_in(1 DOWNTO 0);
-      MW_out(17 DOWNTO 2) <= MW_in(17 DOWNTO 2);
-      MW_out(33 DOWNTO 18) <= MW_in(33 DOWNTO 18);
-      MW_out(36 DOWNTO 34) <= MW_in(36 DOWNTO 34);
     END IF;
   END PROCESS;
 

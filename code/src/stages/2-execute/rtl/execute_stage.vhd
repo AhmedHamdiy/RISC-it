@@ -19,7 +19,7 @@ ENTITY execute_stage IS
     control_signals : IN STD_LOGIC_VECTOR (20 DOWNTO 0);
 
     pc_out : OUT STD_LOGIC_VECTOR (15 DOWNTO 0);
-    Rdst_addr_out : IN STD_LOGIC_VECTOR (2 DOWNTO 0);
+    Rdst_addr_out : OUT STD_LOGIC_VECTOR (2 DOWNTO 0);
 
     out_port : OUT STD_LOGIC_VECTOR (15 DOWNTO 0);
     will_jmp : OUT STD_LOGIC;

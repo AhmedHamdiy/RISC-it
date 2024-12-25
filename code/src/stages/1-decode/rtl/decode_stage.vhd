@@ -53,13 +53,13 @@ ARCHITECTURE decode_stage_arch OF decode_stage IS
 
   COMPONENT control_unit IS
     PORT (
-      clk : IN STD_LOGIC;
       opcode : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
       in_enable, out_enable, reg_write, mem_write, mem_read, mem_to_reg, is_immediate,
       branch, call, ret, interrupt, rti, freeze : OUT STD_LOGIC;
       alu_operation : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
       stack_operation : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
-      jump_type : OUT STD_LOGIC_VECTOR(1 DOWNTO 0)
+      jump_type : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+      store_op : OUT STD_LOGIC
     );
   END COMPONENT;
 
@@ -92,7 +92,8 @@ ARCHITECTURE decode_stage_arch OF decode_stage IS
 
 BEGIN
   inst0 <= selected_inst(0);
-
+  hazard <= hazard_signal;
+  imm <= inst;
   Rsrc1_add <= selected_inst(10 DOWNTO 8);
   Rsrc2_add <= selected_inst(4 DOWNTO 2);
   rsrc1_address <= selected_inst(10 DOWNTO 8);
@@ -113,7 +114,6 @@ BEGIN
 
   CU : control_unit
   PORT MAP(
-    clk => clk,
     opcode => selected_inst(15 DOWNTO 11),
     reg_write => control_unit_out(0),
     mem_to_reg => control_unit_out(1),
