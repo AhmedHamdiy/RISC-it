@@ -143,8 +143,8 @@ ARCHITECTURE risc_processor_arch OF risc_processor IS
   ---------STAGE REGISTERS---------
   SIGNAL FD_in, FD_out : STD_LOGIC_VECTOR (31 DOWNTO 0);
   SIGNAL DE_in, DE_out : STD_LOGIC_VECTOR (127 DOWNTO 0);
-  SIGNAL EM_in, EM_out : STD_LOGIC_VECTOR (63 DOWNTO 0);
-  SIGNAL MW_in, MW_out : STD_LOGIC_VECTOR (63 DOWNTO 0);
+  SIGNAL EM_in, EM_out : STD_LOGIC_VECTOR (127 DOWNTO 0);
+  SIGNAL MW_in, MW_out : STD_LOGIC_VECTOR (127 DOWNTO 0);
   ---------REGISTERS OUTPUTS---------
   SIGNAL FD_inst : STD_LOGIC_VECTOR (15 DOWNTO 0);
   SIGNAL FD_pc_in : STD_LOGIC_VECTOR (15 DOWNTO 0);
@@ -213,9 +213,9 @@ ARCHITECTURE risc_processor_arch OF risc_processor IS
   SIGNAL flush, flush_branch, flush_hazard : STD_LOGIC;
 
   SIGNAL pc_DE : STD_LOGIC_VECTOR (15 DOWNTO 0);
-  SIGNAL Rsrc1_DE, Rsrc2_DE, Rdest_DE : STD_LOGIC_VECTOR (15 DOWNTO 0);
-  SIGNAL Rsrc1_addr_DE, Rsrc2_addr_DE : STD_LOGIC_VECTOR (2 DOWNTO 0);
-  SIGNAL control_signals : STD_LOGIC_VECTOR(20 DOWNTO 0);
+  SIGNAL Rsrc1_DE, Rsrc2_DE : STD_LOGIC_VECTOR (15 DOWNTO 0);
+  SIGNAL Rsrc1_addr_DE, Rsrc2_addr_DE, Rdest_addr_DE : STD_LOGIC_VECTOR (2 DOWNTO 0);
+  SIGNAL control_signals_DE : STD_LOGIC_VECTOR(20 DOWNTO 0);
 
   SIGNAL pc_EM : STD_LOGIC_VECTOR (15 DOWNTO 0);
   SIGNAL Rdest_addr_EM : STD_LOGIC_VECTOR (2 DOWNTO 0);
@@ -274,14 +274,14 @@ BEGIN
     Rsrc2 => Rsrc2_DE,
     Rsrc1_add => Rsrc1_addr_DE,
     Rsrc2_add => Rsrc2_addr_DE,
-    Rdst_address => Rdest_DE,
+    Rdst_address => Rdest_addr_DE,
     imm => Imm_value,
     inst0 => int_index,
     hazard => flush_hazard,
     stall => stall,
     will_branch => branch,
     jmp_add => jmp_add,
-    control_signals => control_signals
+    control_signals => control_signals_DE
   );
 
   execute : execute_stage PORT MAP(
@@ -355,24 +355,27 @@ BEGIN
         FD_out <= (OTHERS => '0');
       END IF;
 
-      DE_in(2 DOWNTO 0) <= dummy;
-      DE_in(5 DOWNTO 3) <= dummy;
-      DE_in(21 DOWNTO 6) <= dummy;
-      DE_in(42 DOWNTO 22) <= dummy;
-      DE_in(58 DOWNTO 43) <= dummy;
-      DE_in(61 DOWNTO 59) <= dummy;
-      DE_in(77 DOWNTO 62) <= dummy;
+      DE_in(2 DOWNTO 0) <= Rsrc1_addr_DE;
+      DE_in(5 DOWNTO 3) <= Rdest_addr_DE;
+      DE_in(21 DOWNTO 6) <= Rsrc1_DE;
+      DE_in(42 DOWNTO 22) <= control_signals_DE;
+      DE_in(58 DOWNTO 43) <= pc_DE;
+      DE_in(61 DOWNTO 59) <= Rsrc2_addr_DE;
+      DE_in(77 DOWNTO 62) <= Rsrc2_DE;
 
-      EM_in(6 DOWNTO 0) <= dummy;
-      EM_in(22 DOWNTO 7) <= dummy;
-      EM_in(38 DOWNTO 23) <= dummy;
-      EM_in(41 DOWNTO 39) <= dummy;
-      EM_in(57 DOWNTO 42) <= dummy;
+      EM_in(10 DOWNTO 0) <= DE_sig(10 DOWNTO 0);
+      EM_in(26 DOWNTO 11) <= DE_Rsrc1;
+      EM_in(42 DOWNTO 27) <= res_EM;
+      EM_in(46 DOWNTO 43) <= Rdest_addr_EM;
+      EM_in(62 DOWNTO 47) <= pc_EM;
+      EM_in(77 DOWNTO 62) <= flags_EM;
 
-      MW_in(1 DOWNTO 0) <= dummy;
-      MW_in(17 DOWNTO 2) <= dummy;
-      MW_in(33 DOWNTO 18) <= dummy;
-      MW_in(36 DOWNTO 34) <= dummy;
+      MW_in(3 DOWNTO 0) <= EM_sig(3 DOWNTO 0);
+      MW_in(19 DOWNTO 4) <= mem_MW; ------------------------------------------------------Memory
+      MW_in(33 DOWNTO 18) <= EM_Res;
+      MW_in(36 DOWNTO 34) <= EM_Rdest_addr;
+      MW_in(52 DOWNTO 37) <= stack_reg_MW;
+      MW_in(68 DOWNTO 53) <= flags_MW;
     END IF;
 
     IF (RISING_EDGE(clk)) THEN
