@@ -123,7 +123,7 @@ BEGIN
   pc_out <= pc_in;
   Rdst_addr_out <= Rdst_addr_in;
 =======
-LIBRARY IEEE;
+LIBRARY IEEE;SIGNAL 
 USE IEEE.std_logic_1164.ALL;
 USE IEEE.numeric_std.ALL;
 

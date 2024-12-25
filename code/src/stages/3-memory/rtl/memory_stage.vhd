@@ -18,13 +18,16 @@ ENTITY memory_stage IS
       int_ex_in : IN STD_LOGIC;
       int_wb_in : IN STD_LOGIC;
       call : IN STD_LOGIC;
-      rti : IN STD_LOGIC;
+      rti_ex_in : IN STD_LOGIC;
+      rti_wb_in : IN STD_LOGIC;
       mem_read : IN STD_LOGIC;
       mem_write : IN STD_LOGIC;
 
       -- Outputs
       mem_data : OUT STD_LOGIC_VECTOR (15 DOWNTO 0);
       stack_reg_out : OUT STD_LOGIC_VECTOR (15 DOWNTO 0);
+      exception : OUT STD_LOGIC;
+      exception_type : OUT STD_LOGIC;
     );
   END memory_stage;
   
@@ -85,89 +88,73 @@ ENTITY memory_stage IS
     END COMPONENT;
 
     -- signals
-    mem_read_enable : STD_LOGIC;
-    mem_write_enable : STD_LOGIC;
-    write_data : STD_LOGIC_VECTOR(1 DOWNTO 0);
-    memory_address : STD_LOGIC_VECTOR(15 DOWNTO 0);
-    stack_address :  STD_LOGIC_VECTOR(15 DOWNTO 0);
-    stack_sel : STD_LOGIC_VECTOR(1 DOWNTO 0);
-    stack_updated : STD_LOGIC_VECTOR(15 DOWNTO 0);
+    SIGNAL mem_read_enable : STD_LOGIC := '0';
+    SIGNAL mem_write_enable : STD_LOGIC:= '0';
+    SIGNAL write_data : STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL memory_address : STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL stack_address :  STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL stack_sel : STD_LOGIC_VECTOR(1 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL stack_updated : STD_LOGIC_VECTOR(15 DOWNTO 0) :=x"0FFF";
+    SIGNAL push_pc : STD_LOGIC:='0';
+    SIGNAL write_data_sel : STD_LOGIC_VECTOR(1 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL incremented_pc : STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL EPC : STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');
     BEGIN
-    
+    mem_write_enable <= mem_write or int_wb_in;
+    mem_read_enable <= mem_read or rti_wb_in;
+    stack_updated <= SP - 1 WHEN stack_op = '11' ELSE SP + 1 WHEN stack_op = '10' ELSE SP;
+    stack_address <= stack_updated WHEN stack_op(0) = '1' ELSE SP;
+    memory_address <= alu_result WHEN stack_op(1) = '1' ELSE stack_address;
+    push_pc <= call or int_ex_in;
+    write_data_sel <= {int_wb_in ,push_pc};
+    incremented_pc <= pc_ex + 1;
+
+
+    --mux to decide the write data
+    mux : mux4to1_16bit PORT MAP (
+      d0 => Rsrc1,
+      d1 => incremented_pc,
+      d2 => flags_in,
+      d3 => flags_in,
+      sel => write_data_sel,
+      y => write_data
+    );
+
     mem : data_memory PORT MAP (
       clk => clk,
-      we => mem_write,
-      re => mem_read,
-      address => alu_result,
-      write_data => Rsrc1,
+      we => mem_write_enable,
+      re => mem_read_enable,
+      address => memory_address,
+      write_data => write_data,
       read_data => mem_data
     );
 
     st : stack_reg PORT MAP (
       clk => clk,
       data_in => stack_reg_in,
-      data_out => stack_updated
+      data_out => SP
     );
 
     ssu : stack_selector_unit PORT MAP (
-      rti => rti,
-      int => int_ex_in,
+      rti => rti_wb_in,
+      int => int_wb_in,
       stack_op => stack_op,
       stack_sel => stack_sel
     );
 
     excep_unit : exeception_unit PORT MAP (
-      PC_mem => pc,
+      PC_mem => pc_mem,
       stack_op => stack_op,
-      SP => stack_reg_in,
-      PC_ex => pc,
+      SP => stack_address,
+      PC_ex => pc_ex,
       mem_exception => mem_exception,
-      exception => open,
-      exception_type => open,
-      EPC => open
+      exception => exception,
+      exception_type => exception_type,
+      EPC => EPC
     );
-
-    mux2to1_16bit_0 : mux2to1_16bit PORT MAP (
-      d0 => alu_result,
-      d1 => pc,
-      sel => call,
-      y => memory_address
-    );
-
-    mux2to1_16bit_0 : mux2to1_16bit PORT MAP (
-      d0 => alu_result,
-      d1 => pc,
-      sel => call,
-      y => memory_address
-    );
-
-    mux2to1_16bit_1 : mux2to1_16bit PORT MAP (
-      d0 => alu_result,
-      d1 => pc,
-      sel => call,
-      y => memory_address
-    );
-
-    mux4to1_16bit_0 : mux4to1_16bit PORT MAP (
-      d0 => alu_result,
-      d1 => pc,
-      d2 => stack_updated,
-      d3 => pc,
-      sel => stack_sel,
-      y => stack_address
-    );
-
-    mux4to1_16bit_1 : mux4to1_16bit PORT MAP (
-      d0 => alu_result,
-      d1 => pc,
-      d2 => stack_updated,
-      d3 => pc,
-      sel => stack_sel,
-      y => stack_address
-    );
-
 
 
     stack_reg_out <= stack_updated;
+
 
   END memory_stage_arch;
