@@ -163,8 +163,8 @@ BEGIN
 
   NOP_inst_mux : mux2to1_16bit
   PORT MAP(
-    d0 => NOP,
-    d1 => inst,
+    d0 => inst,
+    d1 => NOP,
     sel => NOP_mux_selector,
     y => selected_inst
   );

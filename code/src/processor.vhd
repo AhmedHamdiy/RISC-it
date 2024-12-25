@@ -379,8 +379,32 @@ BEGIN
       DE_out <= DE_in;
       EM_out <= EM_in;
       MW_out <= MW_in;
-
     END IF;
   END PROCESS;
+
+  FD_pc_in <= FD_out(15 DOWNTO 0);
+  FD_inst <= FD_out(31 DOWNTO 16);
+
+  DE_src1_addr <= DE_out(2 DOWNTO 0);
+  DE_Rdst_addr_out <= DE_out(5 DOWNTO 3);
+  DE_Rsrc1 <= DE_out(21 DOWNTO 6);
+  DE_sig <= DE_out(42 DOWNTO 22);
+  DE_pc_in <= DE_out(58 DOWNTO 43);
+  DE_src2_addr <= DE_out(61 DOWNTO 59);
+  DE_Rsrc2 <= DE_out(77 DOWNTO 62);
+
+  EM_sig <= EM_out(10 DOWNTO 0);
+  EM_Rsrc1 <= EM_out(26 DOWNTO 11);
+  EM_Res <= EM_out(42 DOWNTO 27);
+  EM_Rdest_addr <= EM_out(45 DOWNTO 43);
+  EM_pc <= EM_out(61 DOWNTO 46);
+  EM_flags <= EM_out(65 DOWNTO 62);
+
+  MW_sig <= MW_out(3 DOWNTO 0);
+  MW_mem <= MW_out(19 DOWNTO 4);
+  MW_res <= MW_out(35 DOWNTO 20);
+  MW_Rdest_addr <= MW_out(38 DOWNTO 36);
+  MW_stack_reg <= MW_out(54 DOWNTO 39);
+  MW_flags <= MW_out(58 DOWNTO 55);
 
 END ARCHITECTURE risc_processor_arch;
