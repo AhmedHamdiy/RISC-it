@@ -2,36 +2,36 @@ LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.NUMERIC_STD.ALL;
 
-entity decode_stage is
-  port (
-    clk           : in std_logic;
-    reset         : in std_logic;
-    inst          : in std_logic_vector(15 downto 0);
-    MEM_WB_rti    : in std_logic;
-    ID_EX_rti     : in std_logic;
-    ret           : in std_logic;
-    write_reg     : in std_logic;
-    has_immediate : in std_logic;
-    data_to_write : in std_logic_vector(15 downto 0);
-    WB_Rdst       : in std_logic_vector(2 downto 0);
-    PC_in         : in std_logic_vector(15 downto 0);
-    ID_EX_Rdst    : in std_logic_vector(2 downto 0);
-    ID_EX_Rsrc1_data   : in std_logic_vector(15 downto 0);
-    ID_EX_mem_read: in std_logic;
-    ID_EX_branch  : in std_logic;
-    EX_MEM_branch : in std_logic;
-    ID_EX_stackop1: in std_logic;
-    pc_out        : out std_logic_vector(15 downto 0);
-    Rsrc1, Rsrc2  : out std_logic_vector(15 downto 0);
-    Rsrc1_add, Rsrc2_add : out std_logic_vector(2 downto 0);
-    Rdst_address  : out std_logic_vector(2 downto 0);
-    imm           : out std_logic_vector(15 downto 0);
-    inst0         : out std_logic;
-    hazard        : out std_logic;
-    stall         : out std_logic;
-    will_branch   : out std_logic;
-    jmp_add       : out std_logic_vector(15 downto 0);
-    control_signals: out std_logic_vector(20 downto 0)
+ENTITY decode_stage IS
+  PORT (
+    clk : IN STD_LOGIC;
+    reset : IN STD_LOGIC;
+    inst : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+    MEM_WB_rti : IN STD_LOGIC;
+    ID_EX_rti : IN STD_LOGIC;
+    ret : IN STD_LOGIC;
+    write_reg : IN STD_LOGIC;
+    has_immediate : IN STD_LOGIC;
+    data_to_write : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+    WB_Rdst : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+    PC_in : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+    ID_EX_Rdst : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+    ID_EX_Rsrc1_data : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+    ID_EX_mem_read : IN STD_LOGIC;
+    ID_EX_branch : IN STD_LOGIC;
+    EX_MEM_branch : IN STD_LOGIC;
+    ID_EX_stackop1 : IN STD_LOGIC;
+    pc_out : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+    Rsrc1, Rsrc2 : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+    Rsrc1_add, Rsrc2_add : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+    Rdst_address : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+    imm : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+    inst0 : OUT STD_LOGIC;
+    hazard : OUT STD_LOGIC;
+    stall : OUT STD_LOGIC;
+    will_branch : OUT STD_LOGIC;
+    jmp_add : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+    control_signals : OUT STD_LOGIC_VECTOR(20 DOWNTO 0)
   );
 END decode_stage;
 
@@ -115,41 +115,41 @@ BEGIN
   PORT MAP(
     clk => clk,
     opcode => selected_inst(15 DOWNTO 11),
-    in_enable => control_unit_out(0),
-    out_enable => control_unit_out(1),
-    reg_write => control_unit_out(2),
-    mem_write => control_unit_out(3),
-    mem_read => control_unit_out(4),
-    mem_to_reg => control_unit_out(5),
-    alu_operation => control_unit_out(8 DOWNTO 6),
-    is_immediate => control_unit_out(9),
-    stack_operation => control_unit_out(11 DOWNTO 10),
-    branch => control_unit_out(12),
-    jump_type => control_unit_out(14 DOWNTO 13),
-    call => control_unit_out(15),
-    ret => control_unit_out(16),
-    interrupt => control_unit_out(17),
-    rti => control_unit_out(18),
+    reg_write => control_unit_out(0),
+    mem_to_reg => control_unit_out(1),
+    interrupt => control_unit_out(2),
+    rti => control_unit_out(3),
+    mem_write => control_unit_out(4),
+    mem_read => control_unit_out(5),
+    stack_operation => control_unit_out(7 DOWNTO 6),
+    branch => control_unit_out(8),
+    call => control_unit_out(9),
+    ret => control_unit_out(10),
+    in_enable => control_unit_out(11),
+    out_enable => control_unit_out(12),
+    alu_operation => control_unit_out(15 DOWNTO 13),
+    is_immediate => control_unit_out(16),
+    jump_type => control_unit_out(18 DOWNTO 17),
     freeze => control_unit_out(19),
     store_op => control_unit_out(20)
   );
 
-  HDU: hazard_detection_unit
-    port map (
-      IF_ID_Rsrc1 => rsrc1_address,
-      IF_ID_Rsrc2 => rsrc2_address,
-      ID_EX_Rdst => ID_EX_Rdst,
-      ID_EX_mem_read => ID_EX_mem_read,
-      ret => ret,
-      rti => MEM_WB_rti,
-      ID_EX_branch => ID_EX_branch,
-      EX_MEM_branch => EX_MEM_branch,
-      hazard => hazard_signal,
-      stall => stall,
-      will_branch => will_branch
-    );
+  HDU : hazard_detection_unit
+  PORT MAP(
+    IF_ID_Rsrc1 => rsrc1_address,
+    IF_ID_Rsrc2 => rsrc2_address,
+    ID_EX_Rdst => ID_EX_Rdst,
+    ID_EX_mem_read => ID_EX_mem_read,
+    ret => ret,
+    rti => MEM_WB_rti,
+    ID_EX_branch => ID_EX_branch,
+    EX_MEM_branch => EX_MEM_branch,
+    hazard => hazard_signal,
+    stall => stall,
+    will_branch => will_branch
+  );
 
-  JMP_dst_Mux_selector <= ret or MEM_WB_rti;
+  JMP_dst_Mux_selector <= ret OR MEM_WB_rti;
 
   JMP_dst_mux : mux2to1_16bit
   PORT MAP(
@@ -159,7 +159,7 @@ BEGIN
     y => jmp_add
   );
 
-  NOP_mux_selector <= ID_EX_rti or has_immediate;
+  NOP_mux_selector <= ID_EX_rti OR has_immediate;
 
   NOP_inst_mux : mux2to1_16bit
   PORT MAP(
