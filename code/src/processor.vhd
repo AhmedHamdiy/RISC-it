@@ -67,8 +67,8 @@ ARCHITECTURE risc_processor_arch OF risc_processor IS
         stall : OUT STD_LOGIC;
         will_branch : OUT STD_LOGIC;
         jmp_add : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
-        control_signals : OUT STD_LOGIC_VECTOR(19 DOWNTO 0)
-      );
+        control_signals : OUT STD_LOGIC_VECTOR(20 DOWNTO 0)
+      )
     );
   END COMPONENT;
 
@@ -87,7 +87,6 @@ ARCHITECTURE risc_processor_arch OF risc_processor IS
         pc_in : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
         Rdst_addr_in : IN STD_LOGIC_VECTOR (2 DOWNTO 0);
 
-        flag_restore : IN STD_LOGIC;
         control_signals : IN STD_LOGIC_VECTOR (20 DOWNTO 0);
 
         pc_out : OUT STD_LOGIC_VECTOR (15 DOWNTO 0);
@@ -134,30 +133,70 @@ ARCHITECTURE risc_processor_arch OF risc_processor IS
   SIGNAL DE_src2_addr : STD_LOGIC_VECTOR (2 DOWNTO 0);
   SIGNAL DE_Rsrc2 : STD_LOGIC_VECTOR (15 DOWNTO 0);
 
-  SIGNAL EM_sig : STD_LOGIC_VECTOR (6 DOWNTO 0);
+  SIGNAL EM_sig : STD_LOGIC_VECTOR (10 DOWNTO 0);
   SIGNAL EM_Rsrc1 : STD_LOGIC_VECTOR (15 DOWNTO 0);
   SIGNAL EM_Res : STD_LOGIC_VECTOR (15 DOWNTO 0);
   SIGNAL EM_Rdest_addr : STD_LOGIC_VECTOR (2 DOWNTO 0);
   SIGNAL EM_pc : STD_LOGIC_VECTOR (15 DOWNTO 0);
+  SIGNAL EM_flags : STD_LOGIC_VECTOR (3 DOWNTO 0);
 
   SIGNAL MW_sig : STD_LOGIC_VECTOR (1 DOWNTO 0);
   SIGNAL MW_mem : STD_LOGIC_VECTOR (15 DOWNTO 0);
   SIGNAL MW_res : STD_LOGIC_VECTOR (15 DOWNTO 0);
   SIGNAL MW_Rdest_addr : STD_LOGIC_VECTOR (2 DOWNTO 0);
+  SIGNAL MW_flags : STD_LOGIC_VECTOR (3 DOWNTO 0);
 
+  ---------SIGNALS ORDER-------------
+  -- DE_sig :
+  -- in_enable => control_unit_out(0),
+  -- out_enable => control_unit_out(1),
+  -- reg_write => control_unit_out(2),
+  -- mem_write => control_unit_out(3),
+  -- mem_read => control_unit_out(4),
+  -- mem_to_reg => control_unit_out(5),
+  -- alu_operation => control_unit_out(8 DOWNTO 6),
+  -- is_immediate => control_unit_out(9),
+  -- stack_operation => control_unit_out(11 DOWNTO 10),
+  -- branch => control_unit_out(12),
+  -- jump_type => control_unit_out(14 DOWNTO 13),
+  -- call => control_unit_out(15),
+  -- ret => control_unit_out(16),
+  -- interrupt => control_unit_out(17),
+  -- rti => control_unit_out(18),
+  -- freeze => control_unit_out(19),
+  -- store_op => control_unit_out(20)
+
+  -- EM_sig :
+  -- reg_write => control_unit_out(0),
+  -- mem_write => control_unit_out(1),
+  -- mem_read => control_unit_out(2),
+  -- mem_to_reg => control_unit_out(3),
+  -- stack_operation => control_unit_out(5 DOWNTO 4),
+  -- branch => control_unit_out(6),
+  -- call => control_unit_out(7),
+  -- ret => control_unit_out(8),
+  -- interrupt => control_unit_out(9),
+  -- rti => control_unit_out(10),
+
+  -- MW_sig :
+  -- reg_write => control_unit_out(0),
+  -- mem_to_reg => control_unit_out(1),
+  -- interrupt => control_unit_out(2),
+  -- rti => control_unit_out(3)
   ---------REGISTERS INPUTS---------
   SIGNAL pc_FD, instruction : STD_LOGIC_VECTOR (15 DOWNTO 0);
-  SIGNAL flush : STD_LOGIC;
+  SIGNAL flush, flush_branch, flush_hazard : STD_LOGIC;
 
   SIGNAL pc_DE : STD_LOGIC_VECTOR (15 DOWNTO 0);
   SIGNAL Rsrc1_DE, Rsrc2_DE, Rdest_DE : STD_LOGIC_VECTOR (15 DOWNTO 0);
   SIGNAL Rsrc1_addr_DE, Rsrc2_addr_DE : STD_LOGIC_VECTOR (2 DOWNTO 0);
-  SIGNAL control_signals : STD_LOGIC_VECTOR(19 DOWNTO 0);
+  SIGNAL control_signals : STD_LOGIC_VECTOR(20 DOWNTO 0);
 
   SIGNAL pc_EM : STD_LOGIC_VECTOR (15 DOWNTO 0);
   SIGNAL Rdest_addr_EM : STD_LOGIC_VECTOR (2 DOWNTO 0);
   SIGNAL branch_EM : STD_LOGIC;
   SIGNAL res_EM : STD_LOGIC_VECTOR (15 DOWNTO 0);
+  SIGNAL flags_EM, flags_MW : STD_LOGIC_VECTOR (3 DOWNTO 0);
 
   ---------OTHER SIGNALS---------
   SIGNAL imm_value : STD_LOGIC_VECTOR (15 DOWNTO 0);
@@ -169,19 +208,19 @@ BEGIN
 
   fetch : fetch_stage PORT MAP(
     clk => clk,
-    HLT => HLT, ---------CONTROL_SIGNAL-----------
-    RTI => DE_sig(14),
-    INT => DE_sig(15),
+    HLT => DE_sig(19),
+    RTI => DE_sig(18),
+    INT => DE_sig(17),
     STALL => stall,
     BRANCH => branch,
     RST => rst,
     EXP_TYPE => -------MEMORY-------------
     EX => -----------MEMORY-------------
     INDEX => int_index,
-    EX_MEM_INT => EM_sig(15),
+    EX_MEM_INT => EM_sig(9),
     JMP_inst => jmp_add,
     instruction => instruction,
-    flush => flush,
+    flush => flush_branch,
     pc => pc_FD
   );
 
@@ -189,21 +228,20 @@ BEGIN
     clk => clk,
     reset => rst,
     inst => FD_inst,
-    MEM_WB_rti => MW_sig(14),
-    ID_EX_rti => DE_sig(14),
-    ret => DE_sig(9),
-    write_reg => MW_sig(19),
-    has_immediate => DE_sig(7),
+    MEM_WB_rti => MW_sig(3),
+    ID_EX_rti => DE_sig(18),
+    ret => DE_sig(16),
+    write_reg => MW_sig(0),
+    has_immediate => DE_sig(9),
     data_to_write => final_result,
     WB_Rdst => MW_Rdest_addr,
     pc_in => DE_pc_in,
     ID_EX_Rdst => DE_Rdst_addr_out,
-    ID_EX_Rsrc1 => DE_src1_addr,
     ID_EX_Rsrc1_data => DE_Rsrc1,
-    ID_EX_mem_read => DE_sig(17),
-    ID_EX_branch => DE_sig(11),
-    EX_MEM_branch => EM_sig(11),
-    ID_EX_stackop1 => DE_sig(3),
+    ID_EX_mem_read => DE_sig(4),
+    ID_EX_branch => DE_sig(12),
+    EX_MEM_branch => EM_sig(6),
+    ID_EX_stackop1 => DE_sig(11),
     pc_out => pc_DE,
     Rsrc1 => Rsrc1_DE,
     Rsrc2 => Rsrc2_DE,
@@ -212,7 +250,7 @@ BEGIN
     Rdst_address => Rdest_DE,
     imm => Imm_value,
     inst0 => int_index,
-    hazard => ----------IF/ID-------------
+    hazard => flush_hazard,
     stall => stall,
     will_branch => branch,
     jmp_add => jmp_add,
@@ -232,18 +270,17 @@ BEGIN
     alu_forwarded_Rsrc1 => EM_Res,
     alu_forwarded_Rsrc2 => EM_Res,
     Imm => Imm_value,
-    flags_in => ----------FLAGS-------------
+    flags_in => final_result,
     in_port => input_port,
     pc_in => DE_pc_in,
     Rdst_addr_in => DE_Rdst_addr_out,
-    flag_restore => ----------CONTROL_SIGNAL-------------
     control_signals => DE_sig,
     pc_out => pc_EM,
     Rdst_addr_out => Rdest_addr_EM,
     out_port => output_port,
     will_jmp => branch_EM,
     mem_excep => mem_excep,
-    flags_out => ----------FLAGS-------------
+    flags_out => flags_EM,
     res => res_EM
   );
 
@@ -252,17 +289,19 @@ BEGIN
   );
 
   writeback : writeback_stage PORT MAP(
-    mem_to_reg => MW_sig(16),
+    mem_to_reg => MW_sig(1),
     mem_data => MW_mem,
     alu_result => MW_res,
     final_result => final_result
   );
 
+  flush <= flush_branch OR flush_hazard;
+
   PROCESS (clk)
   BEGIN
     IF (FALLING_EDGE(clk)) THEN
 
-      FD_in(15 DOWNTO 0) <= pc;
+      FD_in(15 DOWNTO 0) <= pc_FD;
       FD_in(31 DOWNTO 16) <= instruction;
 
       IF (flush = '1') THEN

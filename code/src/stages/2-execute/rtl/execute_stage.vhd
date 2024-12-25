@@ -16,7 +16,6 @@ ENTITY execute_stage IS
     pc_in : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
     Rdst_addr_in : IN STD_LOGIC_VECTOR (2 DOWNTO 0);
 
-    flag_restore : IN STD_LOGIC;
     control_signals : IN STD_LOGIC_VECTOR (20 DOWNTO 0);
 
     pc_out : OUT STD_LOGIC_VECTOR (15 DOWNTO 0);
@@ -34,7 +33,7 @@ ARCHITECTURE execute_stage_arch OF execute_stage IS
 
   COMPONENT alu IS
     PORT (
-      flag_restore : IN STD_LOGIC;
+      flag_restore : IN STD_LOGIC; -- rti????
       flags_reg : IN STD_LOGIC_VECTOR (3 DOWNTO 0);
       a, b : IN STD_LOGIC_VECTOR (15 DOWNTO 0);
       alu_operation : IN STD_LOGIC_VECTOR (2 DOWNTO 0);
@@ -100,24 +99,24 @@ ARCHITECTURE execute_stage_arch OF execute_stage IS
 BEGIN
 
   -- Components
-  alu_inst : alu PORT MAP(flag_restore, flags_in, alu_in1_mux_out, alu_in2_mux_out, control_signals((6 DOWNTO 4)), flags_out_sig, alu_result);
+  alu_inst : alu PORT MAP(control_signals(18), flags_in, alu_in1_mux_out, alu_in2_mux_out, control_signals(8 DOWNTO 6), flags_out_sig, alu_result);
   f_unit_inst : forwarding_unit PORT MAP(clk, src1_addr, src2_addr, prev1_addr, prev2_addr, alu_in1_mux_sel, alu_in2_mux_sel);
 
   -- Muxes
   op1_mux : mux2to1_16bit PORT MAP(Rsrc1, Rsrc2, control_signals(20), alu_in1_mux_in);
-  op2_mux : mux2to1_16bit PORT MAP(Rsrc2, Imm, control_signals(7), alu_in2_mux_in);
+  op2_mux : mux2to1_16bit PORT MAP(Rsrc2, Imm, control_signals(9), alu_in2_mux_in);
   alu_in1_mux : mux4to1_16bit PORT MAP(alu_in1_mux_in, alu_in1_mux_in, mem_forwarded_Rsrc1, alu_forwarded_Rsrc1, alu_in1_mux_sel, alu_in1_mux_out);
   alu_in2_mux : mux4to1_16bit PORT MAP(alu_in2_mux_in, alu_in2_mux_in, mem_forwarded_Rsrc2, alu_forwarded_Rsrc2, alu_in2_mux_sel, alu_in2_mux_out);
-  alu_result_mux : mux2to1_16bit PORT MAP(alu_result, in_port, control_signals(1), res);
-  jmp_mux : mux4 PORT MAP('1', flags_out_sig(1), flags_out_sig(2), flags_out_sig(3), control_signals(13 DOWNTO 12), branch_choice);
+  alu_result_mux : mux2to1_16bit PORT MAP(alu_result, in_port, control_signals(0), res);
+  jmp_mux : mux4 PORT MAP('1', flags_out_sig(1), flags_out_sig(2), flags_out_sig(3), control_signals(14 DOWNTO 13), branch_choice);
 
   -- other compinational logic
   flags_out <= flags_out_sig;
-  will_jmp <= control_signals(11) AND branch_choice;
+  will_jmp <= control_signals(12) AND branch_choice;
   mem_excep <= '1' WHEN (alu_result > x"0FFF")
-    AND (control_signals(17) = '1' OR control_signals(18) = '1') ELSE
+    AND (control_signals(4) = '1' OR control_signals(3) = '1') ELSE
     '0';
-  out_port <= Rsrc1 WHEN control_signals(0) = '1' ELSE
+  out_port <= Rsrc1 WHEN control_signals(1) = '1' ELSE
     (OTHERS => 'Z');
   pc_out <= pc_in;
   Rdst_addr_out <= Rdst_addr_in;

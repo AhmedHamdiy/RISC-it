@@ -16,7 +16,6 @@ entity decode_stage is
     WB_Rdst       : in std_logic_vector(2 downto 0);
     PC_in         : in std_logic_vector(15 downto 0);
     ID_EX_Rdst    : in std_logic_vector(2 downto 0);
-    ID_EX_Rsrc1   : in std_logic_vector(2 downto 0);
     ID_EX_Rsrc1_data   : in std_logic_vector(15 downto 0);
     ID_EX_mem_read: in std_logic;
     ID_EX_branch  : in std_logic;
@@ -32,7 +31,7 @@ entity decode_stage is
     stall         : out std_logic;
     will_branch   : out std_logic;
     jmp_add       : out std_logic_vector(15 downto 0);
-    control_signals: out std_logic_vector(19 downto 0)
+    control_signals: out std_logic_vector(20 downto 0)
   );
 END decode_stage;
 
@@ -82,7 +81,7 @@ ARCHITECTURE decode_stage_arch OF decode_stage IS
     );
   END COMPONENT;
 
-  SIGNAL control_unit_out : STD_LOGIC_VECTOR(19 DOWNTO 0);
+  SIGNAL control_unit_out : STD_LOGIC_VECTOR(20 DOWNTO 0);
   SIGNAL JMP_dst_Mux_selector, NOP_mux_selector, signals_mux_selector : STD_LOGIC;
   SIGNAL NOP : STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0000";
   SIGNAL rsrc1_address, rsrc2_address : STD_LOGIC_VECTOR(2 DOWNTO 0);
@@ -131,7 +130,8 @@ BEGIN
     ret => control_unit_out(16),
     interrupt => control_unit_out(17),
     rti => control_unit_out(18),
-    freeze => control_unit_out(19)
+    freeze => control_unit_out(19),
+    store_op => control_unit_out(20)
   );
 
   HDU: hazard_detection_unit
@@ -173,13 +173,13 @@ BEGIN
 
   selected_signals_mux1 : mux2to1_16bit
   PORT MAP(
-    d0 => control_unit_out(19 DOWNTO 4),
+    d0 => control_unit_out(20 DOWNTO 5),
     d1 => x"0000",
     sel => signals_mux_selector,
-    y => control_signals(19 DOWNTO 4)
+    y => control_signals(20 DOWNTO 5)
   );
 
-  dumy <= "000000000000" & control_unit_out(3 DOWNTO 0);
+  dumy <= "00000000000" & control_unit_out(4 DOWNTO 0);
 
   selected_signals_mux2 : mux2to1_16bit
   PORT MAP(
@@ -189,7 +189,7 @@ BEGIN
     y => dummy
   );
 
-  control_signals(3 DOWNTO 0) <= dummy(3 DOWNTO 0);
+  control_signals(4 DOWNTO 0) <= dummy(4 DOWNTO 0);
   pc_out <= pc_in;
   Rdst_address <= ID_EX_Rdst;
 END decode_stage_arch;
