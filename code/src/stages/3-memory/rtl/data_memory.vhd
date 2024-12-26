@@ -10,7 +10,7 @@ ENTITY data_memory IS
         re : IN STD_LOGIC;
         address : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
         write_data : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
-        read_data : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
+        read_data : OUT STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0')
     );
 END ENTITY data_memory;
 
@@ -29,7 +29,7 @@ BEGIN
         IF RISING_EDGE(clk) THEN
             IF (we = '1' AND TO_INTEGER(UNSIGNED(address)) < mem_depth - 1) THEN
                 ram(TO_INTEGER(UNSIGNED(address))) <= write_data;
-	    END IF;
+            END IF;
             IF (re = '1' AND TO_INTEGER(UNSIGNED(address)) < mem_depth - 1) THEN
                 read_data <= ram(TO_INTEGER(UNSIGNED(address)));
             END IF;

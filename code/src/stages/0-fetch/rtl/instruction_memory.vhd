@@ -24,7 +24,7 @@ ARCHITECTURE instruction_memory_arch OF instruction_memory IS
     TYPE ram_type IS ARRAY(mem_depth - 1 DOWNTO 0) OF STD_LOGIC_VECTOR (word_width - 1 DOWNTO 0);
 
     IMPURE FUNCTION init_ram_from_file RETURN ram_type IS
-        FILE ram_file : TEXT OPEN READ_MODE IS "memory_init.txt";
+        FILE ram_file : TEXT OPEN READ_MODE IS "instruction_memory.txt";
         VARIABLE text_line : LINE;
         VARIABLE ram_content : ram_type;
         VARIABLE bv : BIT_VECTOR(word_width - 1 DOWNTO 0);
@@ -35,9 +35,9 @@ ARCHITECTURE instruction_memory_arch OF instruction_memory IS
             READ(text_line, bv);
             ram_content(i) := TO_STDLOGICVECTOR(bv);
             i := i + 1;
-        END LOOP
+        END LOOP;
         RETURN ram_content;
-    END FUNCTION
+    END FUNCTION;
     SIGNAL ram : ram_type := init_ram_from_file;
 BEGIN
 
