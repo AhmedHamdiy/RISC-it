@@ -99,6 +99,7 @@ BEGIN
   rsrc1_address <= selected_inst(10 DOWNTO 8);
   rsrc2_address <= selected_inst(4 DOWNTO 2);
 
+
   reg_file : register_file
   PORT MAP(
     write_reg => write_reg,
@@ -191,5 +192,5 @@ BEGIN
 
   control_signals(4 DOWNTO 0) <= dummy(4 DOWNTO 0);
   pc_out <= pc_in;
-  Rdst_address <= ID_EX_Rdst;
+  Rdst_address <= selected_inst(7 DOWNTO 5);
 END decode_stage_arch;

@@ -139,7 +139,8 @@ ARCHITECTURE risc_processor_arch OF risc_processor IS
   SIGNAL FD_in, FD_out : STD_LOGIC_VECTOR (31 DOWNTO 0) := (OTHERS => '0');
   SIGNAL DE_in, DE_out : STD_LOGIC_VECTOR (127 DOWNTO 0) := (OTHERS => '0');
   SIGNAL EM_in, EM_out : STD_LOGIC_VECTOR (127 DOWNTO 0) := (OTHERS => '0');
-  SIGNAL MW_in, MW_out : STD_LOGIC_VECTOR (63 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL MW_in : STD_LOGIC_VECTOR (63 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL MW_out : STD_LOGIC_VECTOR (63 DOWNTO 0) := x"0007FF8000000000";
   ---------REGISTERS OUTPUTS---------
   SIGNAL FD_inst : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
   SIGNAL FD_pc_in : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
@@ -164,7 +165,7 @@ ARCHITECTURE risc_processor_arch OF risc_processor IS
   SIGNAL MW_res : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
   SIGNAL MW_Rdest_addr : STD_LOGIC_VECTOR (2 DOWNTO 0) := (OTHERS => '0');
   SIGNAL MW_flags : STD_LOGIC_VECTOR (3 DOWNTO 0) := (OTHERS => '0');
-  SIGNAL MW_stack_reg : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL MW_stack_reg : STD_LOGIC_VECTOR (15 DOWNTO 0) := x"0FFF";
 
   ---------SIGNALS ORDER-------------
   -- DE_sig :
@@ -218,7 +219,9 @@ ARCHITECTURE risc_processor_arch OF risc_processor IS
   SIGNAL res_EM : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');
   SIGNAL flags_EM, flags_MW : STD_LOGIC_VECTOR (3 DOWNTO 0) := (OTHERS => '0');
 
-  SIGNAL mem_MW, stack_reg_MW : STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL mem_MW : STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');
+  SIGNAL  stack_reg_MW : STD_LOGIC_VECTOR(15 DOWNTO 0) :=   x"0FFF";
+
 
   ---------OTHER SIGNALS---------
   SIGNAL imm_value : STD_LOGIC_VECTOR (15 DOWNTO 0) := (OTHERS => '0');

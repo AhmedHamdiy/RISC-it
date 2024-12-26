@@ -12,7 +12,7 @@ ENTITY stack_reg IS
 END ENTITY stack_reg;
 
 ARCHITECTURE stack_reg_arch OF stack_reg IS
-    SIGNAL stack_reg: STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL stack_reg: STD_LOGIC_VECTOR(15 DOWNTO 0) := x"0FFF";
 BEGIN
     PROCESS (clk) IS
     BEGIN

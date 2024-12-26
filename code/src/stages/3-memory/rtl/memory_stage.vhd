@@ -89,9 +89,9 @@ ENTITY memory_stage IS
     mem_write_enable : STD_LOGIC;
     write_data : STD_LOGIC_VECTOR(1 DOWNTO 0);
     memory_address : STD_LOGIC_VECTOR(15 DOWNTO 0);
-    stack_address :  STD_LOGIC_VECTOR(15 DOWNTO 0);
+    stack_address :  STD_LOGIC_VECTOR(15 DOWNTO 0):=x"0FFF";
     stack_sel : STD_LOGIC_VECTOR(1 DOWNTO 0);
-    stack_updated : STD_LOGIC_VECTOR(15 DOWNTO 0);
+    stack_updated : STD_LOGIC_VECTOR(15 DOWNTO 0):= x"0FFF";
     BEGIN
     
     mem : data_memory PORT MAP (
